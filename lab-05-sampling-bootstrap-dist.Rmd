@@ -373,7 +373,7 @@ set.seed(480)
 
 # TODO: choose settings
 target_var <- "fc"
-n_samp <- 100
+n_samp <- 200
 B <- 1000
 
 # one "field campaign" sample
