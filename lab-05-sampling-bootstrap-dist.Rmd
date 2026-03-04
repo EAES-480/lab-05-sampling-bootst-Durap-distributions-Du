@@ -347,7 +347,7 @@ tibble(mean_est = means) %>%
 **Prompt (3–5 sentences):** How close were `se_theory` and `se_simulated`?  
 What changes if you increase `n_samp` vs increase `reps`?
 
-> The `se_theory`(0.8495689	) and `se_simulated` (0.8731462)  were very close. Increasing n_samp reduces the standard error. The variability in the sample mean decreases as sample size increases. Increasing reps, however, does not change the true SE; it only smooth our simulation estimate of the sampling distribution.
+> The `se_theory`(0.8495689	) and `se_simulated` (0.8731462)  were very close. Increasing n_samp reduces the standard error. The variability in the sample mean decreases as sample size increases. Increasing reps, however, does not change the true SE; it only smooths our simulation estimate of the sampling distribution.
 
 
 ---
@@ -406,6 +406,7 @@ tibble(boot_mean = boot_means) %>%
 What is the bootstrap trying to approximate? When is bootstrap especially useful in EAES?
 
 > The bootstrap distribution approximates the sampling distribution of the mean using only one observed sample. Instead of repeatedly sampling from the true population (which is usually unknown in real-world EAES studies), we resample with replacement from our observed data. Bootstrap is especially useful in environmental science where field campaigns are expensive and we often only have one limited dataset.
+
 ---
 
 # Part II — Bootstrap under random vs non-random sampling (SWC)
@@ -527,7 +528,7 @@ swc_samp_summer <- sample(swc_summer_pool, size = n_samp, replace = FALSE)
 # 2) Bootstrap the mean from that sample
 boot_means_summer <- replicate(
   B,
-  mean(sample(swc_summer_pool, size = n_samp, replace = TRUE))
+  mean(sample(swc_samp_summer, size = n_samp, replace = TRUE))
 )
 
 # 3) Summarize
@@ -561,6 +562,7 @@ Explain the difference between **precision** and **accuracy** in this example.
 What *kind* of error is summer-only sampling introducing?
 
 > The bootstrap distribution appears narrow and well-defined, which suggests high precision. But, it is clearly centered far from the population mean. This indicates that although the estimate looks confident, it is not accurate. The summer-only sampling introduces seasonal bias because it does not represent the full annual variability of the sample data. The bootstrap correctly measures uncertainty around the biased sample mean, but it cannot fix a biased sampling design.
+
 ---
 
 ## Exercise 3 — Stratified sampling (by month) → bootstrap distribution
@@ -626,7 +628,7 @@ tibble(boot_mean = boot_means_strat) %>%
 Which sampling design is most accurate for the annual mean? Which looks most precise?  
 What does this teach you about bootstrap and study design?
 
-> The stratified sampling mean is most close to the pop annual mean. The random and stratified samples both produce bootstrap distributions that are centered close to the population mean, while the summer-only sample is clearly centered far from it. All three distributions appear relatively narrow, indicating high precision. However, only the random and stratified designs provide accurate estimates of the annual mean. The summer-only sample is precise but biased due to seasonal sampling. This comparison shows that bootstrap measures precision around the observed sample mean, but it cannot correct for poor study design or sampling bias.
+> The stratified sampling mean is closest to the pop annual mean. The random and stratified samples both produce bootstrap distributions that are centered close to the population mean, while the summer-only sample is clearly centered far from it. All three distributions appear relatively narrow, indicating high precision. However, only the random and stratified designs provide accurate estimates of the annual mean. The summer-only sample is precise but biased due to seasonal sampling. This comparison shows that bootstrap measures precision around the observed sample mean, but it cannot correct for poor study design or sampling bias.
 
 ---
 
@@ -644,8 +646,6 @@ What does this teach you about bootstrap and study design?
 - Knit your `.Rmd` to HTML.
 - Commit and push both the `.Rmd` to your GitHub repo.
 
----
-
 # Part III — Estimating 95% Confidence Intervals with Bootstrap
 
 In this section you will use the bootstrap distributions you learned to create **95% confidence intervals**.
@@ -658,10 +658,10 @@ A 95% bootstrap confidence interval can be estimated using the **2.5% and 97.5% 
 
 Using the **random SWC sample from earlier**, compute a **95% bootstrap confidence interval for the mean**.
 
-```{r ex1_boot_ci_mean, echo=TRUE, eval=FALSE}
+```{r ex1_boot_ci_mean, echo=TRUE, eval=TRUE}
 # GOAL: compute the 2.5% and 97.5% quantiles of the bootstrap distribution
 
-quantile(boot_means_random, probs = c(___, ___))
+quantile(boot_means_random, probs = c(0.025, 0.975))
 ```
 
 **Prompt:**
@@ -669,13 +669,16 @@ quantile(boot_means_random, probs = c(___, ___))
 Does the confidence interval contain the **true population mean (`pop_mean_swc`)**?  
 What does this tell you about the uncertainty of the estimate?
 
+> Yes, the confidence interval contains the true population mean. 
+The 95% bootstrap confidence interval for the mean SWC is approximately 34.78 to 36.93. This suggests that the sample estimate is reasonably accurate and that the bootstrap method provides a realistic estimate of the uncertainty around the sample mean.
+
 ---
 
 ## Exercise 2 — Visualizing the Confidence Interval
 
 Modify the bootstrap histogram from Part II so that the **95% CI is shown on the plot**.
 
-```{r ex2_plot_ci, echo=TRUE, eval=FALSE}
+```{r ex2_plot_ci, echo=TRUE, eval=TRUE}
 boot_ci <- quantile(boot_means_random, probs = c(0.025, 0.975))
 
 tibble(boot_mean = boot_means_random) %>%
@@ -689,6 +692,8 @@ tibble(boot_mean = boot_means_random) %>%
 **Prompt:**
 
 Explain what the **red vertical lines** represent.
+
+> The two solid red vertical lines mark the 2.5th and 97.5th percentiles of the bootstrap distribution, which form a 95% bootstrap confidence interval for the mean. This interval represents the range of mean values that are consistent with the observed sample under bootstrap resampling.
 
 ---
 
@@ -707,25 +712,29 @@ Examples:
 - `swc ~ le`
 - `gpp ~ ta`
 
-```{r ex3_fit_model, echo=TRUE, eval=FALSE}
-response_var <- "___"
-predictor_var <- "___"
+```{r ex3_fit_model, echo=TRUE, eval=TRUE}
+df_sample<-df %>% slice_sample(n=1000,replace=F)
+response_var <- "swc"
+predictor_var <- "ta"
 
-model <- lm(df[[response_var]] ~ df[[predictor_var]])
+df_mod <- df %>%
+  select(all_of(c(response_var, predictor_var))) %>%
+  drop_na()
 
+model <- lm(reformulate(predictor_var, response_var), data = df_mod)
 coef(model)
 ```
 
 ### Bootstrap the regression
 
-```{r ex3_bootstrap_lm, echo=TRUE, eval=FALSE}
+```{r ex3_bootstrap_lm, echo=TRUE, eval=TRUE}
 set.seed(480)
 
 B <- 2000
 
 boot_coef <- replicate(B, {
 
-  samp_rows <- df %>% slice_sample(n = nrow(df), replace = TRUE)
+  samp_rows <- df %>% slice_sample(n = nrow(df_sample), replace = TRUE)
 
   fit <- lm(
     samp_rows[[response_var]] ~ samp_rows[[predictor_var]]
@@ -736,11 +745,13 @@ boot_coef <- replicate(B, {
 })
 
 boot_coef <- t(boot_coef)
+colnames(boot_coef) <- c("intercept", "slope")
+head(boot_coef)
 ```
 
 ### Compute confidence intervals
 
-```{r ex3_ci_params, echo=TRUE, eval=FALSE}
+```{r ex3_ci_params, echo=TRUE, eval=TRUE}
 quantile(boot_coef[,1], probs = c(0.025, 0.975))  # intercept CI
 quantile(boot_coef[,2], probs = c(0.025, 0.975))  # slope CI
 ```
@@ -751,6 +762,8 @@ Interpret the slope confidence interval.
 
 - Does it include zero?
 - What does that imply about the relationship between the predictor and response variable?
+
+> No, this interval does not include zero. The 95% bootstrap confidence interval for the slope is approximately −0.475 to −0.392. It suggests that there is a consistent negative relationship between air temperature (ta) and soil water content (swc) in the data. In plain language, higher temperatures tend to be associated with lower soil water content. This result is consistent with the expectation that warmer conditions increase evaporation and soil moisture loss.
 
 ---
 
