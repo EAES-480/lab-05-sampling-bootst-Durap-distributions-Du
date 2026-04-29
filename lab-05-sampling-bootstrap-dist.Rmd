@@ -15,6 +15,8 @@ editor_options:
   chunk_output_type: console
 ---
 
+> GM GRADE: 9.75/10 - excellent work!
+
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(lubridate)
@@ -148,6 +150,8 @@ pop
 
 > The variable “le” has the largest population standard deviation (approximately 80.6), indicating that it exhibits the greatest variability over time among the selected variables. 
 
+> GM: Good answer!
+
 ---
 
 # Relative error for point estimates (accuracy)
@@ -197,6 +201,8 @@ relerr
 Give a scientific reason why some variables are harder to estimate from a small sample.
 
 > The variable “fc” had the largest relative error (316%). This likely occurred because the population mean of fc is close to zero. When the true mean is small, even modest differences between the sample mean and the population mean can produce very large relative errors.
+
+> GM: Good answer!
 
 ---
 
@@ -283,6 +289,8 @@ Why does accuracy show “diminishing returns” as n increases?
 
 > Accuracy improves when increasing sample size from very small values (e.g., 25 to 100), but gains become smaller at larger sample sizes (e.g., 300 to 1000). As n becomes larger, the sample mean is already fairly stable, so adding more observations yields smaller incremental reductions in error (diminishing returns). 
 
+> GM: Good answer!
+
 ---
 
 # Standard error and sampling distributions
@@ -349,6 +357,7 @@ What changes if you increase `n_samp` vs increase `reps`?
 
 > The `se_theory`(0.8495689	) and `se_simulated` (0.8731462)  were very close. Increasing n_samp reduces the standard error. The variability in the sample mean decreases as sample size increases. Increasing reps, however, does not change the true SE; it only smooths our simulation estimate of the sampling distribution.
 
+> GM: Great answer! minor rephrase: "n_samp reduces the standard error estimated from the spread of the bootstrap distribution"
 
 ---
 
@@ -406,6 +415,8 @@ tibble(boot_mean = boot_means) %>%
 What is the bootstrap trying to approximate? When is bootstrap especially useful in EAES?
 
 > The bootstrap distribution approximates the sampling distribution of the mean using only one observed sample. Instead of repeatedly sampling from the true population (which is usually unknown in real-world EAES studies), we resample with replacement from our observed data. Bootstrap is especially useful in environmental science where field campaigns are expensive and we often only have one limited dataset.
+
+> GM: Great answer!
 
 ---
 
@@ -492,6 +503,8 @@ What does the bootstrap SD represent here?
 
 > The bootstrap distribution is centered around the sample mean (dashed line), and it is relatively close to the population mean (solid line), although there is a small difference between the two. The bootstrap SD represents the estimated standard error of the sample mean, meaning it reflects how much the mean would vary if we repeatedly sampled under the same conditions. 
 
+> GM: Good answer!
+
 ---
 
 ## Exercise 2 — Non-random sample (summer-only) → bootstrap distribution (bias example)
@@ -563,6 +576,8 @@ What *kind* of error is summer-only sampling introducing?
 
 > The bootstrap distribution appears narrow and well-defined, which suggests high precision. But, it is clearly centered far from the population mean. This indicates that although the estimate looks confident, it is not accurate. The summer-only sampling introduces seasonal bias because it does not represent the full annual variability of the sample data. The bootstrap correctly measures uncertainty around the biased sample mean, but it cannot fix a biased sampling design.
 
+> GM: Great answer!
+
 ---
 
 ## Exercise 3 — Stratified sampling (by month) → bootstrap distribution
@@ -630,6 +645,8 @@ What does this teach you about bootstrap and study design?
 
 > The stratified sampling mean is closest to the pop annual mean. The random and stratified samples both produce bootstrap distributions that are centered close to the population mean, while the summer-only sample is clearly centered far from it. All three distributions appear relatively narrow, indicating high precision. However, only the random and stratified designs provide accurate estimates of the annual mean. The summer-only sample is precise but biased due to seasonal sampling. This comparison shows that bootstrap measures precision around the observed sample mean, but it cannot correct for poor study design or sampling bias.
 
+> GM: Great answer!
+
 ---
 
 # Part II wrap-up
@@ -672,6 +689,8 @@ What does this tell you about the uncertainty of the estimate?
 > Yes, the confidence interval contains the true population mean. 
 The 95% bootstrap confidence interval for the mean SWC is approximately 34.78 to 36.93. This suggests that the sample estimate is reasonably accurate and that the bootstrap method provides a realistic estimate of the uncertainty around the sample mean.
 
+> GM: Great answer!
+
 ---
 
 ## Exercise 2 — Visualizing the Confidence Interval
@@ -694,6 +713,8 @@ tibble(boot_mean = boot_means_random) %>%
 Explain what the **red vertical lines** represent.
 
 > The two solid red vertical lines mark the 2.5th and 97.5th percentiles of the bootstrap distribution, which form a 95% bootstrap confidence interval for the mean. This interval represents the range of mean values that are consistent with the observed sample under bootstrap resampling.
+
+> GM: Good answer!
 
 ---
 
@@ -764,6 +785,8 @@ Interpret the slope confidence interval.
 - What does that imply about the relationship between the predictor and response variable?
 
 > No, this interval does not include zero. The 95% bootstrap confidence interval for the slope is approximately −0.475 to −0.392. It suggests that there is a consistent negative relationship between air temperature (ta) and soil water content (swc) in the data. In plain language, higher temperatures tend to be associated with lower soil water content. This result is consistent with the expectation that warmer conditions increase evaporation and soil moisture loss.
+
+> GM: Good answer overall. -0.25 We'd say though that "the relationship between the predictor and response variable is statistically significant".
 
 ---
 
